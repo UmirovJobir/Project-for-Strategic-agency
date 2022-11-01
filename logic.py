@@ -328,7 +328,7 @@ def second_modul_main(first_module_result:DataFrame,user_year:int,skp:list,alpha
         gdp = gdp_forecast(gdp,economic_activity_used_resources,economic_activity_export,economic_activity_import,economic_activities,years_gdp,economic_activities_name)
     return gdp
     
-
+#comment2
 
 
 if __name__ == '__main__':
