@@ -55,3 +55,16 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
     list_filter = ('skp',)
     list_display = ('code_product','product_name', 'skp')
 admin.site.register(Product, ProductAdmin)
+
+@admin.register(X_and_C_for_db) 
+class X_and_C_Admin(admin.ModelAdmin): 
+    list_display = ('name', 'skp', 'year', 'all_used_resources', 'final_demand') 
+ 
+@admin.register(Gdp) 
+class GdpAdmin(admin.ModelAdmin): 
+    list_display = ('name', 'economic_activity', 'gdp', 'year') 
+ 
+ 
+@admin.register(Import_export_for_db) 
+class Import_export_Admin(admin.ModelAdmin): 
+    list_display = ('name', 'skp', 'year', '_import', 'export')
