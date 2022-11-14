@@ -26,7 +26,6 @@ elasticity_dict = dictionary_maker()
 
 # All countries
 class Country_view(APIView): 
-
     def get(self, request):
         countries = Country.objects.all()
         serializer = Country_serializer(countries, many=True)
@@ -35,10 +34,13 @@ class Country_view(APIView):
 # Filtered products by countries with user choosed
 class Product_view(APIView):
     def get(self, request):
-        countries = Country.objects.filter(pk__in=request.data.get('country_id'))
+        city = request.GET.get('country_id')
+        city = city.split(",")
+        countries = Country.objects.filter(pk__in=city)
         products = Product.objects.filter(details__country__in=countries).distinct()
-        serializer = Product_serializer(products, many=True)
+        serializer = Product_serializer(products, many=True)        
         return Response(serializer.data)
+
 
 # Data of products with user choosed by counties which he/she wants to see
 class Detail(APIView):
