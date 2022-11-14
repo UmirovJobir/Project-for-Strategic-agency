@@ -57,7 +57,7 @@ class Detail(APIView):
 # Logical part of project.
 # API gets request (country_id, product_id, duties, year, percent, exchange_rate, percent) and response a future data of skp
 class Data(APIView):   
-    def get(self, request):
+    def post(self, request):
         country_id = request.data['country_id']
         product_id = request.data['product_id']
         duties = request.data['duty']
