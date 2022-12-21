@@ -1,7 +1,7 @@
 from wsgiref.util import request_uri
 from rest_framework import permissions
 from .models import Product, Detail, Country, Gdp, Year, Import_export_for_db
-from .serializers import Detail_serializer, Product_serializer, Country_serializer, Product_serializer_details
+from .serializers import Detail_serializer, Product_serializer, Country_serializer, Product_serializer_details, DetailForSumSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -16,23 +16,20 @@ from get_data import (
     get_data__X_and_C_for_db,
     get_data__matrix_db
 )
+import math
 import warnings
 warnings.filterwarnings('ignore')
 
-from .dict_make import dictionary_maker
-elasticity_dict = dictionary_maker()
-
-
 
 # All countries
-class Country_view(APIView): 
+class CountryView(APIView): 
     def get(self, request):
         countries = Country.objects.all()
         serializer = Country_serializer(countries, many=True)
         return Response(serializer.data)
 
 # Filtered products by countries with user choosed
-class Product_view(APIView):
+class ProductView(APIView):
     def get(self, request):
         city = request.GET.get('country_id')
         city = city.split(",")
@@ -43,7 +40,7 @@ class Product_view(APIView):
 
 
 # Data of products with user choosed by counties which he/she wants to see
-class Detail(APIView):
+class DetailView(APIView):
     def get(self, request):  
         try:
             countries = request.data['country_id']
@@ -56,7 +53,7 @@ class Detail(APIView):
 
 # Logical part of project.
 # API gets request (country_id, product_id, duties, year, percent, exchange_rate, percent) and response a future data of skp
-class Data(APIView):   
+class DataView(APIView):   
     def post(self, request):
         country_id = request.data['country_id']
         product_id = request.data['product_id']
@@ -89,8 +86,9 @@ class Data(APIView):
         first_modul = first_modul_main(countries, skp, products, duties, year, import_percentage, exchange_rate)
         second_modul = second_modul_main(first_modul['imp'], year, skp, import_percentage, export_percentage)
 
+        elasticity_dict = {}
         for i, j in zip(skp, first_modul['elasticity']):
-            elasticity_dict.add(i,j)
+            elasticity_dict[i] = j
 
         return Response(data={"first_modul":{"imp":first_modul['imp'], "elasticity":elasticity_dict},"second_modul":second_modul})
 
@@ -138,3 +136,20 @@ class SaveDataView(APIView):
                 return Response(data={"created data": f"{count}, all data is exist"}, status=status.HTTP_404_NOT_FOUND)
             elif count > 0:
                 return Response(data={"created data": f"{count}"})
+
+
+#API for show sum of all products prices by country id wich user gives 
+class ProductPricesSumView(APIView):       
+    def get(self, request):
+        countries = request.data['country_id']
+        last_year_in_details = Detail.objects.all().last().year
+        price_sum = {}
+        for country_id in countries:
+            details = Detail.objects.filter(country=country_id,year=last_year_in_details)
+            country = Country.objects.get(id=country_id).country_name
+            price_list = []
+            for detail in details:
+                if detail.price is not None:
+                    price_list.append(detail.price)
+            price_sum[country]=math.fsum(price_list)
+        return Response(price_sum)    
