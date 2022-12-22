@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'debug_toolbar',
     'nested_admin',
+    'rest_framework.authtoken',
 
     # django-cors
     'corsheaders'
@@ -130,7 +131,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'ru-ru'
+LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Tashkent'
 
@@ -163,6 +164,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ORIGIN_ALLOW_ALL = True
 
 ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
     ('admin', 'admin@mysite.com'),
 )
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}

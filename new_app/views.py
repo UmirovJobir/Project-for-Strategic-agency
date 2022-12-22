@@ -1,10 +1,16 @@
-from wsgiref.util import request_uri
-from rest_framework import permissions
-from .models import Product, Detail, Country, Gdp, Year, Import_export_for_db
-from .serializers import Detail_serializer, Product_serializer, Country_serializer, Product_serializer_details, DetailForSumSerializer
+from .models import (
+    Product, Detail, Country, 
+    Gdp, Year, Import_export_for_db)
+from .serializers import (
+    Detail_serializer, Product_serializer, 
+    Country_serializer, Product_serializer_details,
+    DetailForSumSerializer,UserSerializer,RegisterSerializer)
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, generics
+from django.contrib.auth.models import User
+from rest_framework.authentication import TokenAuthentication 
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from django.core.exceptions import SuspiciousOperation
 from new_app.libs.psql import db_clint
 import pandas as pd
@@ -21,6 +27,22 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
+#API to register user
+class RegisterUserView(generics.CreateAPIView):
+  permission_classes = (AllowAny,)
+  serializer_class = RegisterSerializer
+
+#API to Get User Details using Token Authentication
+class UserDetailView(APIView):
+  authentication_classes = (TokenAuthentication,)
+  permission_classes = (IsAuthenticated,)
+  def get(self,request,*args,**kwargs):
+    print(request.user.id)
+    user = User.objects.get(id=request.user.id)
+    serializer = UserSerializer(user)
+    return Response(serializer.data)
+
+
 # All countries
 class CountryView(APIView): 
     def get(self, request):
@@ -30,6 +52,8 @@ class CountryView(APIView):
 
 # Filtered products by countries with user choosed
 class ProductView(APIView):
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request):
         city = request.GET.get('country_id')
         city = city.split(",")
@@ -41,6 +65,8 @@ class ProductView(APIView):
 
 # Data of products with user choosed by counties which he/she wants to see
 class DetailView(APIView):
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request):  
         try:
             countries = request.data['country_id']
@@ -54,6 +80,8 @@ class DetailView(APIView):
 # Logical part of project.
 # API gets request (country_id, product_id, duties, year, percent, exchange_rate, percent) and response a future data of skp
 class DataView(APIView):   
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request):
         country_id = request.data['country_id']
         product_id = request.data['product_id']
@@ -95,7 +123,7 @@ class DataView(APIView):
 
 # API to save excel files (requires login password of admin)
 class SaveDataView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = IsAdminUser
 
     def post(self, request):
         file_name = request.data['file_name']
@@ -139,7 +167,9 @@ class SaveDataView(APIView):
 
 
 #API for show sum of all products prices by country id wich user gives 
-class ProductPricesSumView(APIView):       
+class ProductPricesSumView(APIView):   
+    permission_classes = (IsAuthenticated,)
+        
     def get(self, request):
         countries = request.data['country_id']
         last_year_in_details = Detail.objects.all().last().year

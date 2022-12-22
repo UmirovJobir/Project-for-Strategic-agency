@@ -25,7 +25,7 @@ from django.urls import path, include, re_path
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework.permissions import AllowAny
-from strategy_agency import settings
+from rest_framework.authtoken import views
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -38,7 +38,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('strategy-admin/', admin.site.urls),
     path('', include('new_app.urls')),
     path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-docs'),
     path('drf-auth/', include('rest_framework.urls')),
@@ -47,7 +47,7 @@ urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += [re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}),]
 urlpatterns += re_path(r'^_nested_admin/', include('nested_admin.urls')),
-
+urlpatterns += [path('api-token-auth/', views.obtain_auth_token)]
 
 if settings.DEBUG:
     urlpatterns = [

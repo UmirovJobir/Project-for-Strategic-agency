@@ -13,8 +13,8 @@ class Country(models.Model):
 
     def __str__(self):
         return self.country_name
-    class Meta:
-        verbose_name_plural = 'Countries'
+        class Meta:
+            verbose_name_plural = 'Countries'
 
 
 class Product(models.Model):
