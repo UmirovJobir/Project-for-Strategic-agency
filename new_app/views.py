@@ -16,7 +16,7 @@ from new_app.libs.psql import db_clint
 import pandas as pd
 from logic import first_modul_main, second_modul_main
 from get_data import (
-    get_data__countries_data_for_db,
+    get_data__product_data_for_db,
     get_data__import_export_for_db,
     get_data__gdp_for_db,
     get_data__X_and_C_for_db,
@@ -119,51 +119,6 @@ class DataView(APIView):
             elasticity_dict[i] = j
 
         return Response(data={"first_modul":{"imp":first_modul['imp'], "elasticity":elasticity_dict},"second_modul":second_modul})
-
-
-# API to save excel files (requires login password of admin)
-class SaveDataView(APIView):
-    permission_classes = IsAdminUser
-
-    def post(self, request):
-        file_name = request.data['file_name']
-        file = request.data['file']   
-                
-        if file_name=='products details file':
-            count = get_data__countries_data_for_db(file)
-
-        elif file_name=='gdp file':
-            count = get_data__gdp_for_db(file)
-        
-        elif file_name=='import export file':
-            count = get_data__import_export_for_db(file)
-        
-        elif file_name=='x c file':
-            count = get_data__X_and_C_for_db(file)
-        
-        elif file_name=='matrix file':
-            count = get_data__matrix_db(file)
-        
-        else:
-            content = {'ERROR': 'Name of the file unknown.' 
-            'You can send excel file named '
-                'products details file, '
-                'gdp file, '
-                'import export file, '
-                'x c file, '
-                'matrix file'}
-            return Response(content,status=status.HTTP_404_NOT_FOUND)
-        
-        if type(count) == str:
-            if count == "0, all data is exist":
-                return Response(data={"created data": f"{count}"}, status=status.HTTP_404_NOT_FOUND)
-            else:
-                return Response(data={"created data": f"{count}"})
-        elif type(count) == int:
-            if count == 0:
-                return Response(data={"created data": f"{count}, all data is exist"}, status=status.HTTP_404_NOT_FOUND)
-            elif count > 0:
-                return Response(data={"created data": f"{count}"})
 
 
 #API for show sum of all products prices by country id wich user gives 

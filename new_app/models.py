@@ -9,23 +9,23 @@ class Year(models.Model):
 
 
 class Country(models.Model):
-    country_name = models.CharField(max_length=200, unique=True)
+    country_name = models.CharField(max_length=200, unique=True, verbose_name='Страна')
 
     def __str__(self):
         return self.country_name
-        class Meta:
-            verbose_name_plural = 'Countries'
+    class Meta:
+        verbose_name = 'Страна'
+        verbose_name_plural = 'Страны'
 
 
 class Product(models.Model):
     code_product = models.CharField(max_length=50)
-    product_name = models.TextField()
+    product_name = models.TextField(verbose_name='Продукт')
     skp = models.CharField(max_length=50)
 
-    # def __str__(self):
-    #     return self.product_name
     class Meta:
-        verbose_name_plural = 'Products'
+        verbose_name = 'Продукт'
+        verbose_name_plural = 'Продукты'
 
 
 class Detail(models.Model):
@@ -36,7 +36,8 @@ class Detail(models.Model):
     country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='countries')
 
     class Meta:
-        verbose_name_plural = 'Details'
+        verbose_name = 'Деталь'
+        verbose_name_plural = 'Детали'
 
 class Gdp(models.Model):
     name = models.CharField(max_length=300)
@@ -47,7 +48,8 @@ class Gdp(models.Model):
     def __str__(self):
         return self.name
     class Meta:
-        verbose_name_plural = 'Gdp'
+        verbose_name = 'ВВП'
+        verbose_name_plural = 'ВВП'
 
 class Import_export_for_db(models.Model):
     name = models.CharField(max_length=300)
@@ -59,7 +61,8 @@ class Import_export_for_db(models.Model):
     def __str__(self):
         return self.name
     class Meta:
-        verbose_name_plural = 'Import export'
+        verbose_name = 'Импорт-Экспорт'
+        verbose_name_plural = 'Импорт-Экспорт'
 
 class X_and_C_for_db(models.Model):
     name = models.CharField(max_length=300)
@@ -69,7 +72,8 @@ class X_and_C_for_db(models.Model):
     final_demand = models.FloatField(null=True, blank=True)
 
     class Meta:
-        verbose_name_plural = 'X and C'
+        verbose_name = 'X-C'
+        verbose_name_plural = 'X-C'
 
     def __str__(self):
         return self.name
@@ -157,7 +161,7 @@ class Matrix(models.Model):
     def __str__(self):
         return self.A
     class Meta:
-        verbose_name_plural = 'Matrix'
+        verbose_name_plural = 'Матрица'
 
 
 

@@ -1,7 +1,3 @@
-import os,django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "strategy_agency.settings")
-django.setup()
-
 from new_app.models import (
     Product, Detail, Country, Year, 
     Import_export_for_db, Gdp,
@@ -10,7 +6,7 @@ from new_app.models import (
 import pandas as pd
 
 
-def get_data__countries_data_for_db(file):
+def get_data__product_data_for_db(file):
     created_products_len = 0
     created_details_len = 0
     df = pd.read_excel(file)
@@ -166,6 +162,3 @@ def get_data__matrix_db(file):
             created_data_len += 1
     return created_data_len
 
-
-if __name__ == '__main__':
-    get_data__gdp_for_db()

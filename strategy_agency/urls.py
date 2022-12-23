@@ -38,7 +38,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('strategy-admin/', admin.site.urls),
+    path('model-admin/', admin.site.urls), #strategy
     path('', include('new_app.urls')),
     path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-docs'),
     path('drf-auth/', include('rest_framework.urls')),
@@ -48,6 +48,13 @@ urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += [re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}),]
 urlpatterns += re_path(r'^_nested_admin/', include('nested_admin.urls')),
 urlpatterns += [path('api-token-auth/', views.obtain_auth_token)]
+
+
+admin.site.site_header = "Администрация сайта агентства стратегий"
+admin.site.site_title = "Портал администрации агентства стратегии"
+admin.site.index_title = "Добро пожаловать на Портал Стратегического агентства"
+
+
 
 if settings.DEBUG:
     urlpatterns = [
