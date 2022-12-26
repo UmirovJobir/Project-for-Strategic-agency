@@ -8,6 +8,7 @@ from rest_framework import status
 from django.core.exceptions import SuspiciousOperation
 from new_app.libs.psql import db_clint
 import pandas as pd
+import requests
 from logic import first_modul_main, second_modul_main
 from get_data import (
     get_data__countries_data_for_db,
@@ -18,10 +19,6 @@ from get_data import (
 )
 import warnings
 warnings.filterwarnings('ignore')
-
-from .dict_make import dictionary_maker
-elasticity_dict = dictionary_maker()
-
 
 
 # All countries
@@ -64,7 +61,13 @@ class Data(APIView):
         year = request.data['year']
         export_percentage = request.data['export_percentage']
         import_percentage = request.data['import_percentage']
-        exchange_rate = request.data['exchange_rate']
+        
+        url = 'https://cbu.uz/oz/arkhiv-kursov-valyut/json/'
+        response = requests.get(url)
+        res = response.json()
+        USD = float(res[0]['Rate'])
+
+        exchange_rate = USD 
 
         countries = []
         products = []
@@ -89,8 +92,10 @@ class Data(APIView):
         first_modul = first_modul_main(countries, skp, products, duties, year, import_percentage, exchange_rate)
         second_modul = second_modul_main(first_modul['imp'], year, skp, import_percentage, export_percentage)
 
+        elasticity_dict = {}
         for i, j in zip(skp, first_modul['elasticity']):
-            elasticity_dict.add(i,j)
+            elasticity_dict[i] = j
+
 
         return Response(data={"first_modul":{"imp":first_modul['imp'], "elasticity":elasticity_dict},"second_modul":second_modul})
 
