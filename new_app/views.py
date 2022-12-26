@@ -80,7 +80,7 @@ class DetailView(APIView):
 # Logical part of project.
 # API gets request (country_id, product_id, duties, year, percent, exchange_rate, percent) and response a future data of skp
 class DataView(APIView):   
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         country_id = request.data['country_id']
@@ -89,8 +89,14 @@ class DataView(APIView):
         year = request.data['year']
         export_percentage = request.data['export_percentage']
         import_percentage = request.data['import_percentage']
-        exchange_rate = request.data['exchange_rate']
 
+        url = 'https://cbu.uz/oz/arkhiv-kursov-valyut/json/'
+        response = requests.get(url)
+        res = response.json()
+        USD = float(res[0]['Rate'])
+
+        exchange_rate = USD 
+        
         countries = []
         products = []
         skp = []
@@ -138,3 +144,16 @@ class ProductPricesSumView(APIView):
                     price_list.append(detail.price)
             price_sum[country]=math.fsum(price_list)
         return Response(price_sum)    
+
+import requests
+from pprint import pprint
+
+class Money(APIView):
+    def get(self, request):
+        url = 'https://cbu.uz/oz/arkhiv-kursov-valyut/json/'
+        response = requests.get(url)
+        pprint(response.status_code)
+        res = response.json() #['conversion_rate']
+        a = res[0]['Rate']
+        a = float(a)
+        return Response(data={"USD":a})
