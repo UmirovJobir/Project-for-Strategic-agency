@@ -7,7 +7,7 @@ from .models import Product, Detail, Country, Year
 class Year_serializer(serializers.ModelSerializer):
     class Meta:
         model = Year
-        fields = ('year_number',)
+        fields = ('year',)
 
 class Country_serializer(serializers.ModelSerializer):
     class Meta:
@@ -24,6 +24,7 @@ class Product_serializer(serializers.ModelSerializer):
 class FilteredListSerializer(serializers.ListSerializer):
     def to_representation(self, data):
         data = data.filter(country__in=self.context['request'].data['country_id'])
+        print(data)
         return super(FilteredListSerializer, self).to_representation(data)
 
 class Detail_serializer(serializers.ModelSerializer):
@@ -47,4 +48,10 @@ class Product_serializer_details(serializers.ModelSerializer):
     #     for detail_data in details_data:
     #         Detail.objects.create(details=detail, **detail_data)
     #     return detail
-    
+
+
+class DetailForSumSerializer(serializers.ModelSerializer):
+    year = Year_serializer(read_only=True) 
+    class Meta:
+        model = Detail
+        fields = ('price', 'duty','year','product','country')
