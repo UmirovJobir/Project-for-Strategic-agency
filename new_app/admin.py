@@ -10,7 +10,8 @@ from get_data import (
     get_data__import_export_for_db,
     get_data__gdp_for_db,
     get_data__X_and_C_for_db,
-    get_data__matrix_db
+    get_data__matrix_db,
+    get_data__skp_values_for_db
 )
 from .models import (
     Gdp,
@@ -20,7 +21,8 @@ from .models import (
     Import_export_for_db, 
     X_and_C_for_db, 
     Matrix,
-    Gdp
+    Gdp,
+    SkpValues,
 )
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
@@ -68,6 +70,33 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
 
 admin.site.register(Product, ProductAdmin)
 
+@admin.register(SkpValues) 
+class SkpValuesAdmin(admin.ModelAdmin): 
+    list_display = 'id', 'code', 'name'
+
+    def get_urls(self):
+        urls = super().get_urls()
+        new_url = [path('upload-excel/',self.upload_excel)]
+        return new_url + urls
+
+    def upload_excel(self,request):
+        if request.method == "POST":
+            excel_file = request.FILES["upload_excel_file"]
+            if excel_file.name.endswith('.xlsx'):
+                try:
+                    count = get_data__skp_values_for_db(excel_file)
+                    if count == "0, all data is exist":
+                        messages.warning(request,f"{count} data added")
+                    else:
+                        messages.info(request,f"{count} data added")
+                except:
+                    messages.error(request,"The wrong excel file. It is not suitable for this model!")
+            else:
+                messages.error(request,"The wrong file type uploaded")
+
+        form = ExcelImportForm()
+        data = {'form':form}
+        return render(request, 'admin/excel_upload.html', data)
 
 @admin.register(X_and_C_for_db) 
 class X_and_C_Admin(admin.ModelAdmin): 

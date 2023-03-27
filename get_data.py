@@ -1,10 +1,21 @@
 from new_app.models import (
     Product, Detail, Country, Year, 
     Import_export_for_db, Gdp,
-    X_and_C_for_db, Matrix
+    X_and_C_for_db, Matrix, SkpValues
 )
 import pandas as pd
 
+def get_data__skp_values_for_db(file):
+    created_data_len = 0
+    df = pd.read_excel(file)
+    df = df.fillna('-')
+    for i in df.values:
+        try:
+            query = SkpValues.objects.get(code=i[0], name=i[1])
+        except SkpValues.DoesNotExist:
+            query = SkpValues.objects.create(code=i[0], name=i[1])
+            created_data_len += 1
+    return created_data_len   
 
 def get_data__product_data_for_db(file):
     created_products_len = 0

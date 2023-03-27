@@ -1,5 +1,16 @@
 from django.db import models
 
+class SkpValues(models.Model):
+    code = models.CharField(max_length=100)
+    name = models.CharField(max_length=500)
+
+    def __str__(self):
+        return self.code
+
+    class Meta:
+        verbose_name = 'Значение Скп'
+        verbose_name_plural = 'Значения Скп'
+
 
 class Year(models.Model):
     year = models.IntegerField(unique=True)

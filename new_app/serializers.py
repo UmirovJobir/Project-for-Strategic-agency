@@ -65,7 +65,6 @@ class Product_serializer(serializers.ModelSerializer):
 class FilteredListSerializer(serializers.ListSerializer):
     def to_representation(self, data):
         data = data.filter(country__in=self.context['request'].data['country_id'])
-        print(data)
         return super(FilteredListSerializer, self).to_representation(data)
 
 class Detail_serializer(serializers.ModelSerializer):
