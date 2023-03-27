@@ -45,6 +45,7 @@ class UserDetailView(APIView):
     return Response(serializer.data)
 
 
+
 # All countries
 class CountryView(APIView): 
     def get(self, request):
