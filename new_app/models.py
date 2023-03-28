@@ -12,6 +12,7 @@ class SkpValues(models.Model):
         verbose_name_plural = 'Значения Скп'
 
 
+
 class Year(models.Model):
     year = models.IntegerField(unique=True)
 
