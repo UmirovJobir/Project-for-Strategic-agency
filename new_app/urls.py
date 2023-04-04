@@ -3,7 +3,7 @@ from .views import (
     DetailView, CountryView, 
     ProductView, DataView, 
     ProductPricesSumView,
-    UserDetailView,RegisterUserView,Money)
+    UserDetailView,RegisterUserView)
 
 urlpatterns = [
     path('detail/', DetailView.as_view()),
@@ -13,6 +13,5 @@ urlpatterns = [
     path('price_sum/', ProductPricesSumView.as_view()),
     path('user_details/',UserDetailView.as_view()),
     path('register/',RegisterUserView.as_view()),
-    path('monay/', Money.as_view())
 ]
 

@@ -14,16 +14,9 @@ from django.contrib.auth.models import User
 from rest_framework.authentication import TokenAuthentication 
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from django.core.exceptions import SuspiciousOperation
-from new_app.libs.psql import db_clint
-import pandas as pd
+import requests
 from logic import first_modul_main, second_modul_main
-from get_data import (
-    get_data__product_data_for_db,
-    get_data__import_export_for_db,
-    get_data__gdp_for_db,
-    get_data__X_and_C_for_db,
-    get_data__matrix_db
-)
+
 import math
 import warnings
 warnings.filterwarnings('ignore')
@@ -45,7 +38,6 @@ class UserDetailView(APIView):
     return Response(serializer.data)
 
 
-
 # All countries
 class CountryView(APIView): 
     def get(self, request):
@@ -55,22 +47,51 @@ class CountryView(APIView):
 
 # Filtered products by countries with user choosed
 class ProductView(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        city = request.GET.get('country_id')
-        city = city.split(",")
-        countries = Country.objects.filter(pk__in=city)
+        try:
+            countries = request.GET.get('country_id')
+            countries = countries.split(",")
+        except:
+            return Response(data={"error": "country_id parametr is not given"}, status=status.HTTP_400_BAD_REQUEST)
         
-        products = Product.objects.filter(details__country__in=countries).distinct()
         
+        # lst = []
+        # for i in countries:
+        #     product = Product.objects.filter(details__country__id=i).distinct()
+        #     lst.append(product)
+
+        # a = 0
+        # query = Product.objects.none()
+        # print(len(query))
+        # for j in lst:
+        #     if len(query)==0: 
+        #         query = query(j[a])
+        #         print(query)
+
+        #         # a+1
+        #         # if a==len(lst):
+        #         # pass
+                
+        # return Response(data={"a":"b"})
+        
+
+        # products_1 = Product.objects.filter(details__country__id=1).distinct() #.order_by('id')
+        # products_2 = Product.objects.filter(details__country__id=2).distinct()#.order_by('id')
+        # products_3 = Product.objects.filter(details__country__id=3).distinct()#.order_by('id')
+        
+        # products_4 = products_3.intersection(products_1, products_2).order_by('id')
+        # print(products_4)
+        
+        products = Product.objects.filter(details__country__in=countries).distinct().order_by('id')
         serializer = Product_serializer(products, many=True)        
         return Response(serializer.data)
 
 
 # Data of products with user choosed by counties which he/she wants to see
 class DetailView(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request):  
         try:
@@ -154,15 +175,5 @@ class ProductPricesSumView(APIView):
             price_sum[country]=math.fsum(price_list)
         return Response(price_sum)    
 
-import requests
-from pprint import pprint
 
-class Money(APIView):
-    def get(self, request):
-        url = 'https://cbu.uz/oz/arkhiv-kursov-valyut/json/'
-        response = requests.get(url)
-        pprint(response.status_code)
-        res = response.json() #['conversion_rate']
-        a = res[0]['Rate']
-        a = float(a)
-        return Response(data={"USD":a})
+

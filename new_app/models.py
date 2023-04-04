@@ -12,7 +12,6 @@ class SkpValues(models.Model):
         verbose_name_plural = 'Значения Скп'
 
 
-
 class Year(models.Model):
     year = models.IntegerField(unique=True)
 
@@ -33,7 +32,7 @@ class Country(models.Model):
 class Product(models.Model):
     code_product = models.CharField(max_length=50)
     product_name = models.TextField(verbose_name='Продукт')
-    skp = models.CharField(max_length=50)
+    skp          = models.CharField(max_length=50)
 
     class Meta:
         verbose_name = 'Продукт'
@@ -41,9 +40,9 @@ class Product(models.Model):
 
 
 class Detail(models.Model):
-    price = models.FloatField(null=True, blank=True)
-    duty = models.FloatField(null=True, blank=True)
-    year = models.ForeignKey(Year, on_delete=models.CASCADE)
+    price   = models.FloatField(null=True, blank=True)
+    duty    = models.FloatField(null=True, blank=True)
+    year    = models.ForeignKey(Year, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='details')
     country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='countries')
 
@@ -52,10 +51,10 @@ class Detail(models.Model):
         verbose_name_plural = 'Детали'
 
 class Gdp(models.Model):
-    name = models.CharField(max_length=300)
+    name              = models.CharField(max_length=300)
     economic_activity = models.CharField(max_length=50)
-    gdp = models.FloatField(null=True, blank=True)
-    year = models.ForeignKey(Year, on_delete=models.CASCADE)
+    gdp               = models.FloatField(null=True, blank=True)
+    year              = models.ForeignKey(Year, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -64,11 +63,11 @@ class Gdp(models.Model):
         verbose_name_plural = 'ВВП'
 
 class Import_export_for_db(models.Model):
-    name = models.CharField(max_length=300)
-    skp = models.CharField(max_length=50)
-    year = models.ForeignKey(Year, on_delete=models.CASCADE)
+    name    = models.CharField(max_length=300)
+    skp     = models.CharField(max_length=50)
+    year    = models.ForeignKey(Year, on_delete=models.CASCADE)
     _import	= models.FloatField(null=True, blank=True)
-    export = models.FloatField(null=True, blank=True)
+    export  = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -77,11 +76,11 @@ class Import_export_for_db(models.Model):
         verbose_name_plural = 'Импорт-Экспорт'
 
 class X_and_C_for_db(models.Model):
-    name = models.CharField(max_length=300)
-    skp = models.CharField(max_length=50)
-    year = models.ForeignKey(Year, on_delete=models.CASCADE)
+    name                = models.CharField(max_length=300)
+    skp                 = models.CharField(max_length=50)
+    year                = models.ForeignKey(Year, on_delete=models.CASCADE)
     all_used_resources	= models.FloatField(null=True, blank=True)
-    final_demand = models.FloatField(null=True, blank=True)
+    final_demand        = models.FloatField(null=True, blank=True)
 
     class Meta:
         verbose_name = 'X-C'
@@ -91,32 +90,32 @@ class X_and_C_for_db(models.Model):
         return self.name
 
 class Matrix(models.Model):
-    A = models.FloatField(null=True, blank=True)
-    B = models.FloatField(null=True, blank=True)
-    C = models.FloatField(null=True, blank=True)
-    D = models.FloatField(null=True, blank=True)
-    E = models.FloatField(null=True, blank=True)
-    F = models.FloatField(null=True, blank=True)
-    G = models.FloatField(null=True, blank=True)
-    H = models.FloatField(null=True, blank=True)
-    I = models.FloatField(null=True, blank=True)
-    J = models.FloatField(null=True, blank=True)
-    K = models.FloatField(null=True, blank=True)
-    L = models.FloatField(null=True, blank=True)
-    M = models.FloatField(null=True, blank=True)
-    N = models.FloatField(null=True, blank=True)
-    O = models.FloatField(null=True, blank=True)
-    P = models.FloatField(null=True, blank=True)
-    Q = models.FloatField(null=True, blank=True)
-    R = models.FloatField(null=True, blank=True)
-    S = models.FloatField(null=True, blank=True)
-    T = models.FloatField(null=True, blank=True)
-    U = models.FloatField(null=True, blank=True)
-    V = models.FloatField(null=True, blank=True)
-    W = models.FloatField(null=True, blank=True)
-    X = models.FloatField(null=True, blank=True)
-    Y = models.FloatField(null=True, blank=True)
-    Z = models.FloatField(null=True, blank=True)
+    A  = models.FloatField(null=True, blank=True)
+    B  = models.FloatField(null=True, blank=True)
+    C  = models.FloatField(null=True, blank=True)
+    D  = models.FloatField(null=True, blank=True)
+    E  = models.FloatField(null=True, blank=True)
+    F  = models.FloatField(null=True, blank=True)
+    G  = models.FloatField(null=True, blank=True)
+    H  = models.FloatField(null=True, blank=True)
+    I  = models.FloatField(null=True, blank=True)
+    J  = models.FloatField(null=True, blank=True)
+    K  = models.FloatField(null=True, blank=True)
+    L  = models.FloatField(null=True, blank=True)
+    M  = models.FloatField(null=True, blank=True)
+    N  = models.FloatField(null=True, blank=True)
+    O  = models.FloatField(null=True, blank=True)
+    P  = models.FloatField(null=True, blank=True)
+    Q  = models.FloatField(null=True, blank=True)
+    R  = models.FloatField(null=True, blank=True)
+    S  = models.FloatField(null=True, blank=True)
+    T  = models.FloatField(null=True, blank=True)
+    U  = models.FloatField(null=True, blank=True)
+    V  = models.FloatField(null=True, blank=True)
+    W  = models.FloatField(null=True, blank=True)
+    X  = models.FloatField(null=True, blank=True)
+    Y  = models.FloatField(null=True, blank=True)
+    Z  = models.FloatField(null=True, blank=True)
     AA = models.FloatField(null=True, blank=True)
     AB = models.FloatField(null=True, blank=True)
     AC = models.FloatField(null=True, blank=True)
