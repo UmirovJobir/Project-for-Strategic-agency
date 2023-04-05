@@ -138,7 +138,6 @@ class DataView(APIView):
 
         elasticity_dict = {}
         for i, j in zip(skp, first_modul['elasticity']):
-            # for a,b in skp_values.items():
             skp = SkpValues.objects.get(code=i)
             if i==skp.code:
                 elasticity_dict[skp.name] = j
@@ -148,7 +147,7 @@ class DataView(APIView):
 
 #API for show sum of all products prices by country id wich user gives 
 class ProductPricesSumView(APIView):   
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
         
     def get(self, request):
         countries = request.data['country_id']

@@ -38,11 +38,14 @@ class DetailInline(nested_admin.NestedStackedInline):
     model = Detail
     search_fields = ('product',)
     list_filter = ('product', 'year')
+    extra = 0
+
+@admin.register(Product)
 class ProductAdmin(nested_admin.NestedModelAdmin):
     inlines = [DetailInline,]
-    search_fields = ('product_name',)
+    search_fields = ('product_name', 'id')
     list_filter = ('skp',)
-    list_display = ('code_product','product_name', 'skp')
+    list_display = ('id', 'code_product','product_name', 'skp')
 
     def get_urls(self):
         urls = super().get_urls()
@@ -68,7 +71,6 @@ class ProductAdmin(nested_admin.NestedModelAdmin):
         data = {'form':form}
         return render(request, 'admin/excel_upload.html', data)
 
-admin.site.register(Product, ProductAdmin)
 
 @admin.register(SkpValues) 
 class SkpValuesAdmin(admin.ModelAdmin): 
