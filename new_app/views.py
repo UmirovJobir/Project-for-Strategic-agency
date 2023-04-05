@@ -56,35 +56,24 @@ class ProductView(APIView):
         except:
             return Response(data={"error": "country_id parametr is not given"}, status=status.HTTP_400_BAD_REQUEST)
         
-        
-        # lst = []
-        # for i in countries:
-        #     product = Product.objects.filter(details__country__id=i).distinct()
-        #     lst.append(product)
+        lst = []
+        products = 0
 
-        # a = 0
-        # query = Product.objects.none()
-        # print(len(query))
-        # for j in lst:
-        #     if len(query)==0: 
-        #         query = query(j[a])
-        #         print(query)
-
-        #         # a+1
-        #         # if a==len(lst):
-        #         # pass
+        for i in countries:
+            product = Product.objects.filter(details__country__id=i).distinct().order_by('id')
+            lst.append(product)      
+            if len(lst)==2:
+                query = lst[0].intersection(lst[1]).order_by('id')
+                if products == 0:
+                    products = query
+                else:
+                    products = products.intersection(query).order_by('id')
+                lst = []  
                 
-        # return Response(data={"a":"b"})
+        if len(lst)!=0:
+            products = lst[0].intersection(products).order_by('id')
         
-
-        # products_1 = Product.objects.filter(details__country__id=1).distinct() #.order_by('id')
-        # products_2 = Product.objects.filter(details__country__id=2).distinct()#.order_by('id')
-        # products_3 = Product.objects.filter(details__country__id=3).distinct()#.order_by('id')
-        
-        # products_4 = products_3.intersection(products_1, products_2).order_by('id')
-        # print(products_4)
-        
-        products = Product.objects.filter(details__country__in=countries).distinct().order_by('id')
+        # products = Product.objects.filter(details__country__in=countries).distinct().order_by('id')
         serializer = Product_serializer(products, many=True)        
         return Response(serializer.data)
 
