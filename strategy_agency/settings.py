@@ -164,7 +164,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ORIGIN_ALLOW_ALL = True
 
 ADMINS = (
-    ('admin', 'admin@mysite.com'),
+    ('admin', 'admin@mysite.com', '123'),
 )
 
 REST_FRAMEWORK = {

@@ -8,6 +8,8 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from numpy import inner, ndarray, product
 from pandas import DataFrame
+import warnings
+warnings.filterwarnings('ignore')
 
 def swap_columns(df,col1,col2):
     col_list = list(df.columns)
@@ -130,6 +132,7 @@ def first_modul_main(countries:list,skp:list,products:list,duties:list,user_year
     j = 0
     for i in range(starting_point,user_year):
         years = np.append(years,i+1)
+        print(i)
         data = adding_new_duties_to_df(data,products,duties[j],years)
         duty = creating_duties(years,data,skp)
         imp = adding_new_import(years,skp,elasticity,alpha,duty,imp)

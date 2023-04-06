@@ -23,13 +23,13 @@ from .models import (
     Matrix,
     Gdp,
     SkpValues,
+    Year
 )
 from django.contrib import messages
-from django.http import HttpResponse, HttpResponseRedirect
 
 admin.site.unregister(Group)
 
-
+admin.site.register(Year)
 
 class ExcelImportForm(forms.Form):
     upload_excel_file = forms.FileField(label="Загрузить excel файл")
