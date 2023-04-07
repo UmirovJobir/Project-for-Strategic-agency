@@ -10,13 +10,12 @@ from .serializers import (
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics
-from django.contrib.auth.models import User
 from rest_framework.authentication import TokenAuthentication 
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+from django.contrib.auth.models import User
 from django.core.exceptions import SuspiciousOperation
-import requests
 from logic import first_modul_main, second_modul_main
-
+from new_app.libs.API import get_exchange_rate
 import math
 import warnings
 warnings.filterwarnings('ignore')
@@ -84,12 +83,15 @@ class DetailView(APIView):
 
     def get(self, request):  
         try:
-            countries = request.data['country_id']
-            products = Product.objects.filter(pk__in=request.data.get('product_id'))
-            serializer = Product_serializer_details(products, many=True, context={'request': request, "country_id": countries})
+            countries_list = request.data['country_id']
+            products_list = request.data['product_id']
+
+            products = Product.objects.filter(pk__in=products_list)
+            serializer = Product_serializer_details(products, many=True, context={'request': request, "country_id": countries_list})
             return Response(serializer.data)
         except (TypeError, KeyError):
-            raise SuspiciousOperation('Invalid JSON')
+            return Response(data={"error":f"countries_lis or products_list is not given!"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 # Logical part of project.
@@ -104,45 +106,47 @@ class DataView(APIView):
         year = request.data['year']
         export_percentage = request.data['export_percentage']
         import_percentage = request.data['import_percentage']
-
-        url = 'https://cbu.uz/oz/arkhiv-kursov-valyut/json/'
-        response = requests.get(url)
-        res = response.json()
-        USD = float(res[0]['Rate'])
-
-        exchange_rate = USD 
         
-        countries = []
-        products = []
-        skp = []
+        last_detail_year = Detail.objects.last().year
 
-        export_percentage = export_percentage/100
-        import_percentage = import_percentage/100
+        if year - int(f"{last_detail_year}") != len(duties):
+            return Response(data={"error":f"duty length is not equal year from 2019 since {year}"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        else:
+            #Get current dollar currency from The Central Bank's API
+            exchange_rate = get_exchange_rate() 
+            
+            countries = []
+            products = []
+            skp = []
 
-        for country in country_id:
-            name = Country.objects.filter(id=country).values()
-            for i in name:
-                countries.append(i.get('country_name'))
-        for product in product_id:
-            name = Product.objects.filter(id=product).values()
-            for i in name:
-                if i.get('skp') in skp:
-                    products.append(i.get('product_name'))
-                else:
-                    skp.append(i.get('skp'))
-                    products.append(i.get('product_name'))
-        
-        first_modul = first_modul_main(countries, skp, products, duties, year, import_percentage, exchange_rate)
-        second_modul = second_modul_main(first_modul['imp'], year, skp, import_percentage, export_percentage)
+            export_percentage = export_percentage/100
+            import_percentage = import_percentage/100
+
+            for country in country_id:
+                name = Country.objects.filter(id=country).values()
+                for i in name:
+                    countries.append(i.get('country_name'))
+            for product in product_id:
+                name = Product.objects.filter(id=product).values()
+                for i in name:
+                    if i.get('skp') in skp:
+                        products.append(i.get('product_name'))
+                    else:
+                        skp.append(i.get('skp'))
+                        products.append(i.get('product_name'))
+            
+            first_modul = first_modul_main(countries, skp, products, duties, year, import_percentage, exchange_rate)
+            second_modul = second_modul_main(first_modul['imp'], year, skp, import_percentage, export_percentage)
 
 
-        elasticity_dict = {}
-        for i, j in zip(skp, first_modul['elasticity']):
-            skp = SkpValues.objects.get(code=i)
-            if i==skp.code:
-                elasticity_dict[skp.name] = j
+            elasticity_dict = {}
+            for i, j in zip(skp, first_modul['elasticity']):
+                skp = SkpValues.objects.get(code=i)
+                if i==skp.code:
+                    elasticity_dict[skp.name] = j
 
-        return Response(data={"first_modul":{"imp":first_modul['imp'], "elasticity":elasticity_dict},"second_modul":second_modul})
+            return Response(data={"first_modul":{"imp":first_modul['imp'], "elasticity":elasticity_dict},"second_modul":second_modul})
 
 
 #API for show sum of all products prices by country id wich user gives 

@@ -132,7 +132,6 @@ def first_modul_main(countries:list,skp:list,products:list,duties:list,user_year
     j = 0
     for i in range(starting_point,user_year):
         years = np.append(years,i+1)
-        print(i)
         data = adding_new_duties_to_df(data,products,duties[j],years)
         duty = creating_duties(years,data,skp)
         imp = adding_new_import(years,skp,elasticity,alpha,duty,imp)
