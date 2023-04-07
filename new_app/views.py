@@ -1,19 +1,17 @@
 from .models import (
-    Product, Detail, Country, 
-    Gdp, Year, Import_export_for_db,
-    SkpValues
+    Product, Detail, Country, SkpValues
     )
 from .serializers import (
     Detail_serializer, Product_serializer, 
     Country_serializer, Product_serializer_details,
-    DetailForSumSerializer,UserSerializer,RegisterSerializer)
+    UserSerializer,RegisterSerializer
+    )
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics
-from rest_framework.authentication import TokenAuthentication 
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
+from .permissions import IsOwnerOrReadOnly
+from rest_framework.permissions import AllowAny, IsAdminUser
 from django.contrib.auth.models import User
-from django.core.exceptions import SuspiciousOperation
 from logic import first_modul_main, second_modul_main
 from new_app.libs.API import get_exchange_rate
 import math
@@ -28,10 +26,8 @@ class RegisterUserView(generics.CreateAPIView):
 
 #API to Get User Details using Token Authentication
 class UserDetailView(APIView):
-  authentication_classes = (TokenAuthentication,)
-  permission_classes = (IsAuthenticated,)
+  permission_classes = (IsAdminUser, IsOwnerOrReadOnly)
   def get(self,request,*args,**kwargs):
-    print(request.user.id)
     user = User.objects.get(id=request.user.id)
     serializer = UserSerializer(user)
     return Response(serializer.data)
@@ -46,8 +42,6 @@ class CountryView(APIView):
 
 # Filtered products by countries with user choosed
 class ProductView(APIView):
-    # permission_classes = (IsAuthenticated,)
-
     def get(self, request):
         try:
             countries = request.GET.get('country_id')
@@ -79,8 +73,6 @@ class ProductView(APIView):
 
 # Data of products with user choosed by counties which he/she wants to see
 class DetailView(APIView):
-    # permission_classes = (IsAuthenticated,)
-
     def get(self, request):  
         try:
             countries_list = request.data['country_id']
@@ -94,11 +86,26 @@ class DetailView(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
 
+#API for show sum of all products prices by country id wich user gives 
+class ProductPricesSumView(APIView):           
+    def get(self, request):
+        countries = request.data['country_id']
+        last_year_in_details = Detail.objects.all().last().year
+        price_sum = {}
+        for country_id in countries:
+            details = Detail.objects.filter(country=country_id,year=last_year_in_details)
+            country = Country.objects.get(id=country_id).country_name
+            price_list = []
+            for detail in details:
+                if detail.price is not None:
+                    price_list.append(detail.price)
+            price_sum[country]=math.fsum(price_list)
+        return Response(price_sum) 
+    
+
 # Logical part of project.
 # API gets request (country_id, product_id, duties, year, percent, exchange_rate, percent) and response a future data of skp
 class DataView(APIView):   
-    # permission_classes = (IsAuthenticated,)
-
     def post(self, request):
         country_id = request.data['country_id']
         product_id = request.data['product_id']
@@ -149,23 +156,7 @@ class DataView(APIView):
             return Response(data={"first_modul":{"imp":first_modul['imp'], "elasticity":elasticity_dict},"second_modul":second_modul})
 
 
-#API for show sum of all products prices by country id wich user gives 
-class ProductPricesSumView(APIView):   
-    # permission_classes = (IsAuthenticated,)
-        
-    def get(self, request):
-        countries = request.data['country_id']
-        last_year_in_details = Detail.objects.all().last().year
-        price_sum = {}
-        for country_id in countries:
-            details = Detail.objects.filter(country=country_id,year=last_year_in_details)
-            country = Country.objects.get(id=country_id).country_name
-            price_list = []
-            for detail in details:
-                if detail.price is not None:
-                    price_list.append(detail.price)
-            price_sum[country]=math.fsum(price_list)
-        return Response(price_sum)    
+   
 
 
 
