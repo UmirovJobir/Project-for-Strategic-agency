@@ -2,7 +2,7 @@ import os,django
 os.environ.setdefault ("DJANGO_SETTINGS_MODULE", "strategy_agency.settings")
 django.setup()
 
-from new_app.libs.psql import db_clint
+from .psql import db_clint
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression

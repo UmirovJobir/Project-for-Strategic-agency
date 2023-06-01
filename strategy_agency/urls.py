@@ -39,7 +39,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('model-admin/', admin.site.urls), #strategy
-    path('', include('new_app.urls')),
+    path('', include('module.urls')),
     path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-docs'),
     path('api-token-auth/', views.obtain_auth_token)
 ]
