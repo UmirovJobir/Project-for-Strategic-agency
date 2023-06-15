@@ -9,6 +9,8 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.generics import GenericAPIView, CreateAPIView, ListAPIView
 from rest_framework.response import Response
 
+from drf_yasg.utils import swagger_auto_schema
+
 from .libs import logic, API
 from .models import Product, Detail, Country, SkpValues
 from .serializers import (
@@ -18,6 +20,12 @@ from .serializers import (
     )
 
 warnings.filterwarnings('ignore')
+
+class Logout(APIView):
+    def post(self, request, format=None):
+        request.user.auth_token.delete()
+        return Response(status=status.HTTP_200_OK)
+
 
 #API to register user
 class RegisterUserView(CreateAPIView):
@@ -29,6 +37,7 @@ class RegisterUserView(CreateAPIView):
 class UserDetailView(APIView):
   def get(self,request,*args,**kwargs):
     user = User.objects.get(id=request.user.id)
+    print(user.auth_token)
     serializer = UserSerializer(user)
     return Response(serializer.data)
 

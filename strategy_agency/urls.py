@@ -13,19 +13,18 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-
-from django.views.static import serve
 from django.conf import settings
-from django.conf.urls.static import static
-
 from django.contrib import admin
-from django.urls import path, include, re_path
+from django.conf.urls.static import static
+from django.urls import path, include
 
-
-from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from rest_framework.permissions import AllowAny
+from drf_yasg.views import get_schema_view
 from rest_framework.authtoken import views
+from rest_framework import permissions, authentication
+
+
+from module.views import Logout
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -33,28 +32,27 @@ schema_view = get_schema_view(
         default_version='v1',
         description='Swagger docs for Rest API',
     ),
+    authentication_classes=(authentication.TokenAuthentication,),
     public=True,
-    permission_classes=(AllowAny,)
-)
+    permission_classes=(permissions.AllowAny,)
+)   
 
 urlpatterns = [
     path('model-admin/', admin.site.urls), #strategy
-    path('', include('module.urls')),
+    path('module/', include('module.urls')),
     path('docs/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-docs'),
-    path('api-token-auth/', views.obtain_auth_token)
+    path('nested_admin/', include('nested_admin.urls')),
+    path('api-token-auth/', views.obtain_auth_token),
+    path('logout/', Logout.as_view()),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-urlpatterns += [re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT,}),]
-urlpatterns += re_path(r'^_nested_admin/', include('nested_admin.urls')),
-urlpatterns += [path('api-token-auth/', views.obtain_auth_token)]
 
 
 admin.site.site_header = "Администрация сайта агентства стратегий"
 admin.site.site_title = "Портал администрации агентства стратегии"
 admin.site.index_title = "Добро пожаловать на Портал Стратегического агентства"
-
 
 
 if settings.DEBUG:
