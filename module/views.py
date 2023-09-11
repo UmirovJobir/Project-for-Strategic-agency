@@ -126,7 +126,7 @@ class DataView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
         last_detail_year = Detail.objects.last().year
-
+        print(year-int(f"{last_detail_year}"))
         if year - int(f"{last_detail_year}") != len(duties):
             return Response(data={"error":f"duty length is not equal year from 2019 since {year}"}, status=status.HTTP_400_BAD_REQUEST)
         else:
